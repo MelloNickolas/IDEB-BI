@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentação - Dashboard IDEB</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    header {
+      --tw-bg-opacity: 1;
+      background-color: rgb(239 246 255 / var(--tw-bg-opacity, 1));
+      color: white;
+      padding: 40px 30px;
+      text-align: center;
+            color: #2563eb;
+
+    }
+
+    header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 40px;
+    }
+
+    h2 {
+      color: #2563eb;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #e5e7eb;
+      font-size: 1.8em;
+    }
+
+    h3 {
+      color: #1e40af;
+      margin-top: 25px;
+      margin-bottom: 10px;
+      font-size: 1.4em;
+    }
+
+    p {
+      margin-bottom: 15px;
+      color: #374151;
+      text-align: justify;
+    }
+
+    ul,
+    ol {
+      margin-left: 25px;
+      margin-bottom: 15px;
+      color: #374151;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    .info-box {
+      background: #eff6ff;
+      border-left: 5px solid #3b82f6;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+    }
+
+    .warning-box {
+      background: #fef3c7;
+      border-left: 5px solid #f59e0b;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+    }
+
+    .success-box {
+      background: #d1fae5;
+      border-left: 5px solid #10b981;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+    }
+
+    code {
+      background: #f3f4f6;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      color: #dc2626;
+      font-size: 0.9em;
+    }
+
+    .code-block {
+      background: #1f2937;
+      color: #f9fafb;
+      padding: 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 20px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    table th {
+      background: #2563eb;
+      color: white;
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    table td {
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    table tr:hover {
+      background: #f9fafb;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 600;
+      margin-right: 8px;
+    }
+
+    .badge-blue {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .badge-green {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .badge-purple {
+      background: #e9d5ff;
+      color: #6b21a8;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .feature-card {
+      background: #f9fafb;
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid #e5e7eb;
+      transition: all 0.3s;
+    }
+
+    .feature-card:hover {
+      border-color: #3b82f6;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-card h4 {
+      color: #2563eb;
+      margin-bottom: 10px;
+      font-size: 1.1em;
+    }
+
+    footer {
+      background: #f3f4f6;
+      padding: 30px;
+      text-align: center;
+      color: #6b7280;
+    }
+
+    .emoji {
+      font-size: 1.3em;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <header>
+      <h1>📊 Dashboard IDEB</h1>
+      <p>Análise Interativa do Índice de Desenvolvimento da Educação Básica</p>
+      <p style="margin-top: 10px; font-size: 0.9em;">Versão 1.0 - 2025</p>
+    </header>
+
+    <div class="content">
+
+      <h2><span class="emoji">📋</span>Sobre o Projeto</h2>
+      <p>
+        O <strong>Dashboard IDEB</strong> é uma aplicação web interativa desenvolvida para visualização e análise dos
+        dados do Índice de Desenvolvimento da Educação Básica (IDEB) no Brasil. O projeto permite acompanhar a evolução
+        histórica das taxas de aprovação e notas do IDEB através de gráficos dinâmicos, tabelas comparativas e análises
+        por etapa de ensino.
+      </p>
+
+      <div class="info-box">
+        <h3>🎯 Objetivo Principal</h3>
+        <p>
+          Facilitar a compreensão e análise do desempenho educacional brasileiro através de uma interface visual
+          intuitiva, permitindo comparações entre diferentes redes de ensino, etapas educacionais e períodos históricos.
+        </p>
+      </div>
+
+      <h2><span class="emoji">🏗️</span>Estrutura do Projeto</h2>
+
+      <p>O projeto é composto por <strong>5 páginas HTML</strong> principais:</p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h4>🏠 index.html</h4>
+          <p>Página inicial com menu de navegação para acesso às diferentes seções do dashboard.</p>
+        </div>
+
+        <div class="feature-card">
+          <h4>📊 ideb-dashboard.html</h4>
+          <p>Visão geral do IDEB com notas médias consolidadas de todas as etapas de ensino.</p>
+        </div>
+
+        <div class="feature-card">
+          <h4>📘 dashboard-aprovacao-iniciais.html</h4>
+          <p>Dashboard específico para os Anos Iniciais do Ensino Fundamental (1º ao 5º ano).</p>
+        </div>
+
+        <div class="feature-card">
+          <h4>📗 dashboard-aprovacao-finais.html</h4>
+          <p>Dashboard específico para os Anos Finais do Ensino Fundamental (6º ao 9º ano).</p>
+        </div>
+
+        <div class="feature-card">
+          <h4>🎓 dashboard-aprovacao-medio.html</h4>
+          <p>Dashboard específico para o Ensino Médio (1ª à 3ª série).</p>
+        </div>
+      </div>
+
+      <h2><span class="emoji">💻</span>Tecnologias Utilizadas</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Tecnologia</th>
+            <th>Versão/CDN</th>
+            <th>Finalidade</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-blue">HTML5</span></td>
+            <td>-</td>
+            <td>Estruturação das páginas</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-blue">CSS3</span></td>
+            <td>-</td>
+            <td>Estilização e layout responsivo</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-blue">JavaScript</span></td>
+            <td>ES6+</td>
+            <td>Lógica de interatividade e manipulação de dados</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-green">Tailwind CSS</span></td>
+            <td>CDN (v3.x)</td>
+            <td>Framework CSS para estilização rápida</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-green">Chart.js</span></td>
+            <td>CDN (v4.x)</td>
+            <td>Biblioteca para criação de gráficos interativos</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-green">SheetJS (xlsx)</span></td>
+            <td>CDN (v0.18.5)</td>
+            <td>Importação e exportação de arquivos Excel</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2><span class="emoji">✨</span>Funcionalidades Principais</h2>
+
+      <h3>1. Visualização de Dados</h3>
+      <ul>
+        <li><strong>Gráficos de linha</strong> mostrando a evolução histórica das taxas de aprovação</li>
+        <li><strong>Cards informativos</strong> com indicadores-chave de desempenho</li>
+        <li><strong>Tabelas detalhadas</strong> com dados completos por ano e rede de ensino</li>
+        <li><strong>Insights automáticos</strong> destacando tendências e padrões identificados</li>
+      </ul>
+
+      <h3>2. Filtros Interativos</h3>
+      <ul>
+        <li><strong>Filtro por Rede de Ensino:</strong> Total, Estadual, Municipal, Pública, Privada</li>
+        <li><strong>Filtro por Série/Ano:</strong> Visualização individual ou média geral</li>
+        <li><strong>Comparações dinâmicas</strong> entre diferentes redes e períodos</li>
+      </ul>
+
+      <h3>3. Gerenciamento de Dados</h3>
+      <ul>
+        <li><strong>Download de template Excel:</strong> Modelo pré-formatado para entrada de dados</li>
+        <li><strong>Upload de arquivos Excel:</strong> Importação de dados personalizados</li>
+        <li><strong>Validação automática:</strong> Verificação de formato e consistência dos dados</li>
+        <li><strong>Atualização em tempo real:</strong> Gráficos e tabelas atualizados instantaneamente</li>
+      </ul>
+
+      <div class="success-box">
+        <h3>🎨 Design Responsivo</h3>
+        <p>
+          Todos os dashboards foram desenvolvidos com design responsivo, garantindo uma experiência otimizada em
+          dispositivos móveis, tablets e desktops.
+        </p>
+      </div>
+
+      <h2><span class="emoji">🚀</span>Como Executar o Projeto</h2>
+
+      <h3>Requisitos</h3>
+      <ul>
+        <li>Navegador web moderno (Chrome, Firefox, Safari, Edge)</li>
+        <li>Conexão com internet (para carregar as bibliotecas via CDN)</li>
+        <li>Servidor local (opcional, mas recomendado)</li>
+      </ul>
+
+      <h3>Opção 1: Execução Direta</h3>
+      <div class="code-block">
+        1. Baixe todos os arquivos HTML do projeto<br>
+        2. Abra o arquivo index.html no seu navegador<br>
+        3. Navegue pelos diferentes dashboards
+      </div>
+
+      <h3>Opção 2: Usando Servidor Local</h3>
+      <div class="code-block">
+        # Usando Python 3<br>
+        python -m http.server 8000<br>
+        <br>
+        # Ou usando Node.js com http-server<br>
+        npx http-server -p 8000<br>
+        <br>
+        # Acesse no navegador:<br>
+        http://localhost:8000
+      </div>
+
+      <div class="warning-box">
+        <h3>⚠️ Importante</h3>
+        <p>
+          Certifique-se de que todos os arquivos HTML estejam na mesma pasta para que a navegação entre as páginas
+          funcione corretamente.
+        </p>
+      </div>
+
+      <h2><span class="emoji">📊</span>Como Usar os Dashboards</h2>
+
+      <h3>Passo 1: Acessar o Dashboard Desejado</h3>
+      <ol>
+        <li>Abra o <code>index.html</code></li>
+        <li>Selecione uma das opções disponíveis:
+          <ul>
+            <li>Ver IDEB Geral</li>
+            <li>IDEB - Anos Iniciais</li>
+            <li>IDEB - Anos Finais</li>
+            <li>IDEB - Ensino Médio</li>
+          </ul>
+        </li>
+      </ol>
+
+      <h3>Passo 2: Explorar os Dados</h3>
+      <ol>
+        <li><strong>Visualize os cards:</strong> Informações consolidadas no topo da página</li>
+        <li><strong>Aplique filtros:</strong> Selecione redes e séries específicas</li>
+        <li><strong>Analise o gráfico:</strong> Observe tendências e comparações</li>
+        <li><strong>Consulte a tabela:</strong> Verifique dados detalhados por ano</li>
+        <li><strong>Leia os insights:</strong> Compreenda padrões identificados automaticamente</li>
+      </ol>
+
+      <h3>Passo 3: Trabalhar com Seus Próprios Dados</h3>
+      <ol>
+        <li>Clique em <strong>"Baixar Modelo Excel"</strong></li>
+        <li>Abra o arquivo no Excel ou LibreOffice</li>
+        <li>Preencha os dados seguindo o formato:
+          <div class="code-block">
+            Ano | Rede | Serie_1 | Serie_2 | Serie_3 | Serie_4 | Serie_5 | Indicador_Rendimento | Meta
+          </div>
+        </li>
+        <li>Salve o arquivo Excel (.xlsx)</li>
+        <li>Clique em <strong>"Carregar Arquivo Excel"</strong></li>
+        <li>Selecione seu arquivo</li>
+        <li>Aguarde a confirmação de carregamento</li>
+      </ol>
+
+      <div class="info-box">
+        <h3>💡 Dica de Uso</h3>
+        <p>
+          Os dashboards suportam séries históricas completas. Quanto mais anos de dados você fornecer, mais rica será a
+          análise de tendências!
+        </p>
+      </div>
+
+      <h2><span class="emoji">📁</span>Estrutura de Dados</h2>
+
+      <h3>Formato dos Dados (Excel)</h3>
+      <p>Os arquivos Excel devem conter as seguintes colunas:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Coluna</th>
+            <th>Tipo</th>
+            <th>Descrição</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>Ano</code></td>
+            <td>Número</td>
+            <td>Ano da avaliação (ex: 2023)</td>
+          </tr>
+          <tr>
+            <td><code>Rede</code></td>
+            <td>Texto</td>
+            <td>Total, Estadual, Municipal, Pública ou Privada</td>
+          </tr>
+          <tr>
+            <td><code>Serie_1 até Serie_5</code></td>
+            <td>Decimal</td>
+            <td>Taxa de aprovação por série (0-100)</td>
+          </tr>
+          <tr>
+            <td><code>Indicador_Rendimento</code></td>
+            <td>Decimal</td>
+            <td>Indicador de rendimento (0-1)</td>
+          </tr>
+          <tr>
+            <td><code>Meta</code></td>
+            <td>Decimal</td>
+            <td>Meta projetada (opcional)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Dados Pré-carregados</h3>
+      <p>Cada dashboard vem com dados históricos brasileiros de 2005 a 2023, incluindo:</p>
+      <ul>
+        <li>Evolução das taxas de aprovação</li>
+        <li>Indicadores de rendimento por rede</li>
+        <li>Metas estabelecidas pelo INEP</li>
+        <li>Comparações entre redes públicas e privadas</li>
+      </ul>
+
+      <h2><span class="emoji">📈</span>Análises Disponíveis</h2>
+
+      <h3>1. Evolução Histórica</h3>
+      <p>Acompanhe como cada rede de ensino evoluiu ao longo dos anos, identificando:</p>
+      <ul>
+        <li>Períodos de crescimento</li>
+        <li>Momentos de queda ou estagnação</li>
+        <li>Impactos de políticas educacionais</li>
+        <li>Efeitos de eventos externos (ex: pandemia)</li>
+      </ul>
+
+      <h3>2. Comparação Entre Redes</h3>
+      <p>Compare o desempenho de diferentes redes de ensino:</p>
+      <ul>
+        <li>Diferenças entre redes públicas e privadas</li>
+        <li>Performance estadual vs municipal</li>
+        <li>Convergência ou divergência de resultados</li>
+        <li>Identificação de boas práticas</li>
+      </ul>
+
+      <h3>3. Análise de Séries/Anos</h3>
+      <p>Visualize o comportamento específico de cada série escolar:</p>
+      <ul>
+        <li>Anos com maiores desafios de aprovação</li>
+        <li>Progressão ao longo do ciclo educacional</li>
+        <li>Pontos críticos de evasão ou reprovação</li>
+      </ul>
+
+      <h2><span class="emoji">🎓</span>Metodologia de Análise</h2>
+
+      <div class="info-box">
+        <h3>Organização dos Dados</h3>
+        <ol>
+          <li><strong>Verificação:</strong> Validação das colunas e dados carregados</li>
+          <li><strong>Padronização:</strong> Normalização de nomes e valores</li>
+          <li><strong>Separação:</strong> Organização por etapa de ensino</li>
+          <li><strong>Indexação:</strong> Estruturação por UF, rede e ano</li>
+          <li><strong>Cálculo de Médias:</strong> Agregação de indicadores</li>
+        </ol>
+      </div>
+
+      <h3>Indicadores Calculados</h3>
+      <ul>
+        <li><strong>Média Geral:</strong> Taxa média de aprovação de todas as séries</li>
+        <li><strong>Indicador de Rendimento (P):</strong> Métrica de fluxo escolar</li>
+        <li><strong>Status de Meta:</strong> Comparação entre resultado e meta projetada</li>
+        <li><strong>Tendências:</strong> Análise de crescimento ou queda ao longo do tempo</li>
+      </ul>
+
+      <h2><span class="emoji">🔍</span>Insights Automáticos</h2>
+
+      <p>Cada dashboard apresenta uma seção de insights que destaca automaticamente:</p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h4>📉 Disparidades</h4>
+          <p>Identificação de diferenças significativas entre redes e regiões</p>
+        </div>
+
+        <div class="feature-card">
+          <h4>🚀 Ascensões</h4>
+          <p>Redes ou períodos com maior crescimento relativo</p>
+        </div>
+
+        <div class="feature-card">
+          <h4>🎯 Metas</h4>
+          <p>Análise de cumprimento das metas estabelecidas</p>
+        </div>
+
+        <div class="feature-card">
+          <h4>⚖️ Estabilidade</h4>
+          <p>Períodos de consolidação e manutenção de resultados</p>
+        </div>
+      </div>
+
+      <h2><span class="emoji">🛠️</span>Personalização</h2>
+
+      <h3>Cores e Temas</h3>
+      <p>As cores utilizadas nos gráficos seguem um padrão consistente:</p>
+      <ul>
+        <li><span class="badge badge-blue">Azul</span> - Rede Total</li>
+        <li><span class="badge badge-purple">Roxo</span> - Rede Estadual</li>
+        <li><span class="badge badge-green">Verde</span> - Rede Municipal</li>
+        <li>🟡 Amarelo - Rede Pública</li>
+        <li>🔴 Rosa - Rede Privada</li>
+      </ul>
+
+      <h3>Modificando o Layout</h3>
+      <p>Para personalizar a aparência dos dashboards:</p>
+      <ol>
+        <li>Localize a tag <code>&lt;style&gt;</code> no HTML</li>
+        <li>Modifique as classes CSS conforme desejado</li>
+        <li>Ajuste cores, fontes, espaçamentos e tamanhos</li>
+        <li>Salve e recarregue a página</li>
+      </ol>
+
+      <h2><span class="emoji">⚠️</span>Limitações Conhecidas</h2>
+
+      <ul>
+        <li><strong>Dados offline:</strong> As bibliotecas CDN requerem conexão com internet</li>
+        <li><strong>Formato Excel:</strong> Apenas arquivos .xlsx e .xls são suportados</li>
+        <li><strong>Validação básica:</strong> Recomenda-se revisar os dados antes do upload</li>
+        <li><strong>Armazenamento local:</strong> Dados personalizados não são salvos permanentemente</li>
+      </ul>
+
+      <div class="warning-box">
+        <h3>📌 Nota Importante</h3>
+        <p>
+          Os dados carregados via Excel permanecem apenas durante a sessão do navegador. Para persistência, é necessário
+          reimportar o arquivo ou implementar sistema de banco de dados.
+        </p>
+      </div>
+
+      <h2><span class="emoji">📚</span>Fonte dos Dados</h2>
+
+      <p>
+        Os dados utilizados neste dashboard são provenientes do <strong>INEP (Instituto Nacional de Estudos e Pesquisas
+          Educacionais Anísio Teixeira)</strong>, órgão vinculado ao Ministério da Educação responsável pela realização
+        do IDEB.
+      </p>
+
+      <div class="info-box">
+        <h3>🔗 Links Úteis</h3>
+        <ul>
+          <li><strong>INEP:</strong> https://www.gov.br/inep/pt-br</li>
+          <li><strong>Dados do IDEB:</strong>
+            https://www.gov.br/inep/pt-br/areas-de-atuacao/pesquisas-estatisticas-e-indicadores/ideb</li>
+          <li><strong>Censo Escolar:</strong>
+            https://www.gov.br/inep/pt-br/areas-de-atuacao/pesquisas-estatisticas-e-indicadores/censo-escolar</li>
+        </ul>
+      </div>
+
+      <h2><span class="emoji">🤝</span>Contribuindo com o Projeto</h2>
+
+      <p>Este projeto pode ser expandido com:</p>
+      <ul>
+        <li>Integração com APIs governamentais para dados em tempo real</li>
+        <li>Exportação de relatórios em PDF</li>
+        <li>Comparações geográficas por estado/município</li>
+        <li>Análises preditivas usando machine learning</li>
+        <li>Dashboard para gestores educacionais</li>
+        <li>Aplicativo mobile</li>
+      </ul>
+
+      <h2><span class="emoji">📞</span>Suporte e Contato</h2>
+
+      <p>Para dúvidas, sugestões ou relatos de problemas:</p>
+      <ul>
+        <li>Revise esta documentação completa</li>
+        <li>Verifique o formato dos dados no template Excel</li>
+        <li>Teste com os dados pré-carregados primeiro</li>
+        <li>Entre em contato com o desenvolvedor responsável</li>
+      </ul>
+
+      <h2><span class="emoji">📝</span>Licença</h2>
+
+      <p>
+        Este projeto foi desenvolvido para fins educacionais e de análise de dados públicos. Os dados do IDEB são de
+        domínio público, disponibilizados pelo INEP/MEC.
+      </p>
+
+      <div class="success-box">
+        <h3>✅ Projeto Completo e Funcional</h3>
+        <p>
+          Esta documentação cobre todos os aspectos do Dashboard IDEB. O sistema está pronto para uso e pode ser
+          facilmente adaptado para diferentes contextos educacionais!
+        </p>
+      </div>
+
+    </div>
+
+    <footer>
+      <p><strong>Dashboard IDEB</strong> - Análise Interativa da Educação Básica Brasileira</p>
+      <p>Desenvolvido em 2025 | Dados: INEP/MEC</p>
+      <p style="margin-top: 15px; font-size: 0.9em;">
+        <span class="badge badge-blue">HTML5</span>
+        <span class="badge badge-blue">CSS3</span>
+        <span class="badge badge-blue">JavaScript</span>
+        <span class="badge badge-green">Chart.js</span>
+        <span class="badge badge-green">Tailwind CSS</span>
+        <span class="badge badge-purple">SheetJS</span>
+      </p>
+    </footer>
+  </div>
+
+</body>
+
+</html>

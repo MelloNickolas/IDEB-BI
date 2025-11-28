@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard IDEB - Home</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f1f5f9;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        header {
+            background: #2563eb;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .container {
+            margin-top: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .btn {
+            width: 85%;
+            max-width: 350px;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            background: #3b82f6;
+            color: white;
+            transition: 0.2s;
+        }
+
+        .btn:hover {
+            background: #1e40af;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    Dashboard IDEB - Seleção
+</header>
+
+<div class="container">
+
+    <button class="btn" onclick="irPara('ideb-dashboard.html')">
+        📊 Ver IDEB Geral
+    </button>
+
+    <button class="btn" onclick="irPara('dashboard-aprovacao-iniciais.html')">
+        📘 IDEB - Anos Iniciais
+    </button>
+
+    <button class="btn" onclick="irPara('dashboard-aprovacao-finais.html')">
+        📗 IDEB - Anos Finais
+    </button>
+
+    <button class="btn" onclick="irPara('dashboard-aprovacao-medio.html')">
+        🎓 IDEB - Ensino Médio
+    </button>
+
+    <button class="btn" onclick="irPara('dashboard-aprovacao-medio.html')">
+        📖 Documentação
+    </button>
+
+</div>
+
+<script>
+    function irPara(pagina) {
+        window.location.href = pagina;
+    }
+</script>
+
+</body>
+</html>

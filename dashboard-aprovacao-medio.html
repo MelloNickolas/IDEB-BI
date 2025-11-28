@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Taxa de Aprovação - Ensino Médio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+
+<body class="bg-gradient-to-br from-purple-50 to-pink-100 min-h-screen p-8">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Taxa de Aprovação - Ensino Médio</h1>
+            <p class="text-gray-600 text-lg">Análise por Rede de Ensino (1ª, 2ª, 3ª série + Supletivo) - Brasil</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold text-gray-800">📊 Gerenciar Dados</h3>
+                <div class="flex gap-3">
+                    <button onclick="downloadTemplate()"
+                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                        ⬇️ Baixar Modelo Excel
+                    </button>
+                    <label
+                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition cursor-pointer">
+                        ⬆️ Carregar Arquivo Excel
+                        <input type="file" accept=".xlsx,.xls" onchange="handleFileUpload(event)" class="hidden">
+                    </label>
+                </div>
+            </div>
+
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                <p class="text-sm text-blue-900"><strong>Como usar:</strong></p>
+                <ol class="text-sm text-blue-800 mt-2 ml-4 list-decimal space-y-1">
+                    <li>Clique em "Baixar Modelo Excel"</li>
+                    <li>Preencha com os dados da 1ª, 2ª, 3ª série e Supletivo</li>
+                    <li>Salve o arquivo (.xlsx)</li>
+                    <li>Faça upload</li>
+                </ol>
+                <p class="text-sm text-blue-900 mt-3">
+                    <strong>💡 Formato:</strong> Ano, Rede, Serie_1, Serie_2, Serie_3, Supletivo, Indicador_Rendimento,
+                    Meta
+                </p>
+            </div>
+
+            <div id="uploadStatus" class="mt-4 hidden"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-lg shadow-lg p-4 border-l-4 border-blue-500">
+                <p class="text-gray-500 text-xs font-medium">Total Brasil</p>
+                <p class="text-2xl font-bold mt-2" id="card-total">74.4%</p>
+                <p class="text-gray-600 text-xs mt-1">Indicador: 0.70</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-lg p-4 border-l-4 border-purple-500">
+                <p class="text-gray-500 text-xs font-medium">Estadual</p>
+                <p class="text-2xl font-bold mt-2" id="card-estadual">76.8%</p>
+                <p class="text-gray-600 text-xs mt-1">Indicador: 0.73</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-lg p-4 border-l-4 border-yellow-500">
+                <p class="text-gray-500 text-xs font-medium">Pública</p>
+                <p class="text-2xl font-bold mt-2" id="card-publica">73.1%</p>
+                <p class="text-gray-600 text-xs mt-1">Indicador: 0.69</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-lg p-4 border-l-4 border-pink-500">
+                <p class="text-gray-500 text-xs font-medium">Privada</p>
+                <p class="text-2xl font-bold mt-2" id="card-privada">91.8%</p>
+                <p class="text-gray-600 text-xs mt-1">Indicador: 0.92</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="flex items-center gap-4 mb-6 flex-wrap">
+                <span class="font-semibold text-gray-700">Visualizar Rede:</span>
+                <button onclick="filterRede('all')" id="btn-all"
+                    class="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm">Todas</button>
+                <button onclick="filterRede('total')" id="btn-total"
+                    class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm">Total</button>
+                <button onclick="filterRede('estadual')" id="btn-estadual"
+                    class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm">Estadual</button>
+                <button onclick="filterRede('publica')" id="btn-publica"
+                    class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm">Pública</button>
+                <button onclick="filterRede('privada')" id="btn-privada"
+                    class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm">Privada</button>
+            </div>
+
+            <div class="flex items-center gap-4 mb-6 flex-wrap">
+                <span class="font-semibold text-gray-700">Visualizar Série:</span>
+                <button onclick="filterSerie('media')" id="btn-media"
+                    class="px-4 py-2 rounded-lg bg-green-600 text-white text-sm">Média Geral</button>
+                <button onclick="filterSerie('1')" id="btn-1"
+                    class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm">1ª série</button>
+                <button onclick="filterSerie('2')" id="btn-2"
+                    class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm">2ª série</button>
+                <button onclick="filterSerie('3')" id="btn-3"
+                    class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm">3ª série</button>
+                <button onclick="filterSerie('sup')" id="btn-sup"
+                    class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm">Supletivo</button>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Evolução da Taxa de Aprovação</h3>
+            <canvas id="chartEvolution" height="100"></canvas>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Dados Completos por Ano</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs" id="dataTable">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-3 py-2 text-left font-semibold">Ano</th>
+                            <th class="px-3 py-2 text-left font-semibold">Rede</th>
+                            <th class="px-3 py-2 text-center font-semibold">1ª série</th>
+                            <th class="px-3 py-2 text-center font-semibold">2ª série</th>
+                            <th class="px-3 py-2 text-center font-semibold">3ª série</th>
+                            <th class="px-3 py-2 text-center font-semibold">Supletivo</th>
+                            <th class="px-3 py-2 text-center font-semibold">Média</th>
+                            <th class="px-3 py-2 text-center font-semibold">Meta</th>
+                            <th class="px-3 py-2 text-center font-semibold">Indicador (P)</th>
+                            <th class="px-3 py-2 text-center font-semibold">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">💡 Insights Detalhados (Ensino Médio - 2023)</h3>
+            <div class="space-y-4 text-gray-700">
+                <div class="p-4 bg-orange-50 rounded-lg border-l-4 border-orange-500">
+                    <p class="font-semibold text-orange-800 mb-1">⚠️ Gargalo Crítico na Transição (1º Ano)</p>
+                    <p>O <strong>1º ano (S1)</strong> é a série com a menor taxa de aprovação em todas as redes. A Rede Pública registra <strong>88.0%</strong> no S1, indicando o principal ponto de dificuldade na entrada deste novo ciclo de estudos.</p>
+                </div>
+                <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                    <p class="font-semibold text-blue-800 mb-1">✅ Metas Públicas Superadas</p>
+                    <p>Tanto o indicador Total (0.92) quanto a Rede Pública (0.91) <strong>superaram</strong> suas respectivas metas de 91.3% e 90.5%. Isso demonstra uma performance robusta da rede pública em relação aos objetivos de 2023.</p>
+                </div>
+                <div class="p-4 bg-red-50 rounded-lg border-l-4 border-red-500">
+                    <p class="font-semibold text-red-800 mb-1">🚨 Alerta: Rede Privada Não Atinge Meta</p>
+                    <p>A Rede Privada, apesar de ter a maior aprovação nas séries regulares (98.9% no S3), registrou indicador de <strong>0.96</strong>, ficando abaixo de sua meta de 97.1%. Há instabilidade notável no Supletivo/EJA (<strong>91.2%</strong>), que impactou a média geral.</p>
+                </div>
+                <div class="p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
+                    <p class="font-semibold text-green-800 mb-1">📈 Forte Evolução Histórica (S3)</p>
+                    <p>A aprovação do <strong>3º ano (S3)</strong> na Rede Pública saltou de 79.6% (2005) para <strong>93.8%</strong> (2023), representando uma evolução de mais de 14 pontos percentuais, mostrando o sucesso na consolidação do ciclo.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-8 text-gray-600 text-sm">
+            <p>Fonte: INEP</p>
+            <p class="mt-1">Dashboard - Taxa de Aprovação no Ensino Médio</p>
+        </div>
+    </div>
+
+    <script>
+        let currentData = [
+            { ano: 2005, rede: "Total", s1: 65.6, s2: 75.3, s3: 81.8, sup: 90.3, indicador: 0.77, meta: 73.2 },
+            { ano: 2005, rede: "Estadual", s1: 62.7, s2: 72.7, s3: 79.4, sup: 89.3, indicador: 0.75, meta: 70.5 },
+            { ano: 2005, rede: "Pública", s1: 62.9, s2: 72.9, s3: 79.6, sup: 90.0, indicador: 0.75, meta: 70.6 },
+            { ano: 2005, rede: "Privada", s1: 89.3, s2: 93.4, s3: 95.7, sup: 95.1, indicador: 0.93, meta: 92.7 },
+
+            { ano: 2007, rede: "Total", s1: 67.1, s2: 76.2, s3: 81.8, sup: 89.8, indicador: 0.78, meta: 74.1 },
+            { ano: 2007, rede: "Estadual", s1: 64.8, s2: 73.9, s3: 79.6, sup: 88.8, indicador: 0.76, meta: 71.6 },
+            { ano: 2007, rede: "Pública", s1: 64.9, s2: 74.2, s3: 79.9, sup: 89.4, indicador: 0.76, meta: 71.8 },
+            { ano: 2007, rede: "Privada", s1: 90.3, s2: 94.5, s3: 97.0, sup: 96.3, indicador: 0.94, meta: 93.8 },
+
+            { ano: 2009, rede: "Total", s1: 68.6, s2: 78.1, s3: 84.2, sup: 90.6, indicador: 0.80, meta: 75.9 },
+            { ano: 2009, rede: "Estadual", s1: 66.2, s2: 75.8, s3: 82.1, sup: 90.0, indicador: 0.78, meta: 73.5 },
+            { ano: 2009, rede: "Pública", s1: 66.4, s2: 76.0, s3: 82.3, sup: 90.5, indicador: 0.78, meta: 73.7 },
+            { ano: 2009, rede: "Privada", s1: 89.5, s2: 94.1, s3: 96.9, sup: 92.7, indicador: 0.93, meta: 93.3 },
+
+            { ano: 2011, rede: "Total", s1: 77.4, s2: 70.2, s3: 79.4, sup: 85.5, indicador: 0.88, meta: 80.0 },
+            { ano: 2011, rede: "Estadual", s1: 75.0, s2: 67.6, s3: 77.2, sup: 83.7, indicador: 0.87, meta: 78.0 },
+            { ano: 2011, rede: "Pública", s1: 75.2, s2: 67.8, s3: 77.4, sup: 83.8, indicador: 0.88, meta: 78.0 },
+            { ano: 2011, rede: "Privada", s1: 93.4, s2: 89.8, s3: 94.2, sup: 97.0, indicador: 0.95, meta: 94.0 },
+
+            { ano: 2013, rede: "Total", s1: 80.1, s2: 73.2, s3: 82.0, sup: 88.0, indicador: 0.88, meta: 82.0 },
+            { ano: 2013, rede: "Estadual", s1: 78.0, s2: 70.9, s3: 79.9, sup: 86.4, indicador: 0.87, meta: 81.0 },
+            { ano: 2013, rede: "Pública", s1: 78.1, s2: 71.0, s3: 80.1, sup: 86.5, indicador: 0.87, meta: 81.0 },
+            { ano: 2013, rede: "Privada", s1: 93.8, s2: 90.1, s3: 94.6, sup: 97.4, indicador: 0.89, meta: 93.0 },
+
+            { ano: 2015, rede: "Total", s1: 81.7, s2: 74.6, s3: 83.6, sup: 89.5, indicador: 0.87, meta: 83.0 },
+            { ano: 2015, rede: "Estadual", s1: 79.7, s2: 72.3, s3: 81.8, sup: 88.0, indicador: 0.86, meta: 82.0 },
+            { ano: 2015, rede: "Pública", s1: 79.8, s2: 72.5, s3: 81.9, sup: 88.1, indicador: 0.87, meta: 82.0 },
+            { ano: 2015, rede: "Privada", s1: 94.5, s2: 91.0, s3: 95.2, sup: 97.8, indicador: 0.95, meta: 95.0 },
+
+            { ano: 2017, rede: "Total", s1: 83.1, s2: 76.4, s3: 84.7, sup: 90.5, indicador: 0.85, meta: 84.0 },
+            { ano: 2017, rede: "Estadual", s1: 81.2, s2: 74.1, s3: 82.9, sup: 89.2, indicador: 0.83, meta: 82.0 },
+            { ano: 2017, rede: "Pública", s1: 81.4, s2: 74.3, s3: 83.1, sup: 89.3, indicador: 0.84, meta: 83.0 },
+            { ano: 2017, rede: "Privada", s1: 95.7, s2: 92.9, s3: 96.2, sup: 98.3, indicador: 0.95, meta: 96.0 },
+
+            { ano: 2019, rede: "Total", s1: 80.5, s2: 87.3, s3: 92.5, sup: 88.9, indicador: 0.87, meta: 86.1 },
+            { ano: 2019, rede: "Estadual", s1: 78.5, s2: 85.8, s3: 91.5, sup: 86.6, indicador: 0.85, meta: 84.5 },
+            { ano: 2019, rede: "Pública", s1: 78.7, s2: 85.9, s3: 91.6, sup: 88.5, indicador: 0.86, meta: 84.7 },
+            { ano: 2019, rede: "Privada", s1: 94.0, s2: 96.8, s3: 98.6, sup: 97.4, indicador: 0.97, meta: 96.4 },
+
+            { ano: 2021, rede: "Total", s1: 91.1, s2: 89.3, s3: 92.3, sup: 87.8, indicador: 0.90, meta: 90.8 },
+            { ano: 2021, rede: "Estadual", s1: 90.4, s2: 88.1, s3: 91.2, sup: 88.2, indicador: 0.89, meta: 89.8 },
+            { ano: 2021, rede: "Pública", s1: 90.2, s2: 88.1, s3: 91.2, sup: 88.1, indicador: 0.89, meta: 89.8 },
+            { ano: 2021, rede: "Privada", s1: 97.9, s2: 98.4, s3: 99.3, sup: 83.2, indicador: 0.94, meta: 98.5 },
+
+            { ano: 2023, rede: "Total", s1: 88.9, s2: 91.6, s3: 94.5, sup: 93.1, indicador: 0.92, meta: 91.3 },
+            { ano: 2023, rede: "Estadual", s1: 88.0, s2: 90.7, s3: 93.7, sup: 94.6, indicador: 0.92, meta: 90.5 },
+            { ano: 2023, rede: "Pública", s1: 88.0, s2: 90.7, s3: 93.8, sup: 93.2, indicador: 0.91, meta: 90.5 },
+            { ano: 2023, rede: "Privada", s1: 96.1, s2: 97.7, s3: 98.9, sup: 91.2, indicador: 0.96, meta: 97.1 }
+        ];
+
+        let chartEvolution;
+        let currentFilterRede = 'all';
+        let currentFilterSerie = 'media';
+
+        window.onload = function () {
+            updateCards();
+            createChart();
+            updateTable();
+        };
+
+        function downloadTemplate() {
+            const wb = XLSX.utils.book_new();
+            const data = [
+                ['Ano', 'Rede', 'Serie_1', 'Serie_2', 'Serie_3', 'Supletivo', 'Indicador_Rendimento', 'Meta'],
+                [2005, 'Total', 65.6, 75.3, 81.8, 90.3, 0.77, 73.2],
+                [2005, 'Estadual', 62.7, 72.7, 79.4, 89.3, 0.75, 70.5],
+                [2005, 'Pública', 62.9, 72.9, 79.6, 90.0, 0.75, 70.6],
+                [2005, 'Privada', 89.3, 93.4, 95.7, 95.1, 0.93, 92.7],
+                ['', '', '', '', '', '', '', ''],
+                [2023, 'Total', 88.9, 91.6, 94.5, 93.1, 0.92, 91.3],
+                [2023, 'Estadual', 88.0, 90.7, 93.7, 94.6, 0.92, 90.5],
+                [2023, 'Pública', 88.0, 90.7, 93.8, 93.2, 0.91, 90.5],
+                [2023, 'Privada', 96.1, 97.7, 98.9, 91.2, 0.96, 97.1]
+            ];
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            XLSX.utils.book_append_sheet(wb, ws, 'Taxa_Aprovacao_Medio');
+            XLSX.writeFile(wb, 'modelo_taxa_aprovacao_medio.xlsx');
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                    const newData = jsonData.map(row => ({
+                        ano: parseInt(row.Ano),
+                        rede: row.Rede,
+                        s1: parseFloat(row.Serie_1) || 0,
+                        s2: parseFloat(row.Serie_2) || 0,
+                        s3: parseFloat(row.Serie_3) || 0,
+                        sup: parseFloat(row.Supletivo) || 0,
+                        indicador: parseFloat(row.Indicador_Rendimento) || 0,
+                        meta: parseFloat(row.Meta) || null
+                    })).filter(row => row.ano && row.rede);
+                    currentData = newData;
+                    updateCards();
+                    createChart();
+                    updateTable();
+                    document.getElementById('uploadStatus').innerHTML = `
+                        <div class="p-3 bg-green-50 border border-green-200 rounded-lg">
+                            <p class="text-green-800 font-semibold">✓ Arquivo carregado! (${newData.length} registros)</p>
+                        </div>
+                    `;
+                    document.getElementById('uploadStatus').classList.remove('hidden');
+                } catch (error) {
+                    alert('Erro ao processar arquivo!');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function updateCards() {
+            const lastYear = Math.max(...currentData.map(d => d.ano));
+            const lastData = currentData.filter(d => d.ano === lastYear);
+            lastData.forEach(d => {
+                const media = ((d.s1 + d.s2 + d.s3 + d.sup) / 4).toFixed(1);
+                const cardId = `card-${d.rede.toLowerCase()}`;
+                const card = document.getElementById(cardId);
+                if (card) {
+                    card.textContent = `${media}%`;
+                    card.nextElementSibling.textContent = `Indicador: ${d.indicador.toFixed(2)}`;
+                }
+            });
+        }
+
+        function createChart() {
+            if (chartEvolution) chartEvolution.destroy();
+            const anos = [...new Set(currentData.map(d => d.ano))].sort();
+            const datasets = getDatasets();
+            const ctx = document.getElementById('chartEvolution').getContext('2d');
+            chartEvolution = new Chart(ctx, {
+                type: 'line',
+                data: { labels: anos, datasets: datasets },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'top' } },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 55,
+                            max: 100,
+                            ticks: { callback: value => value + '%' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function getDatasets() {
+            const anos = [...new Set(currentData.map(d => d.ano))].sort();
+            const redes = ['Total', 'Estadual', 'Pública', 'Privada'];
+            const colors = {
+                'Total': '#3b82f6', 
+                'Estadual': '#8b5cf6',
+                'Pública': '#f59e0b', 
+                'Privada': '#ec4899'
+            };
+            const datasets = [];
+            redes.forEach(rede => {
+                const normalize = txt => txt.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+                if (
+                    currentFilterRede !== 'all' &&
+                    normalize(currentFilterRede) !== normalize(rede.toLowerCase())
+                ) return;
+                const data = anos.map(ano => {
+                    const row = currentData.find(d => d.ano === ano && d.rede === rede);
+                    if (!row) return null;
+                    if (currentFilterSerie === 'media') {
+                        return ((row.s1 + row.s2 + row.s3 + row.sup) / 4).toFixed(1);
+                    } else if (currentFilterSerie === 'sup') {
+                        return row.sup;
+                    } else {
+                        return row[`s${currentFilterSerie}`];
+                    }
+                });
+                datasets.push({
+                    label: rede, data: data,
+                    borderColor: colors[rede],
+                    backgroundColor: colors[rede],
+                    borderWidth: 3, tension: 0.1
+                });
+                const metaData = anos.map(ano => {
+                    const row = currentData.find(d => d.ano === ano && d.rede === rede);
+                    return row && row.meta ? row.meta : null;
+                });
+                if (metaData.some(m => m !== null)) {
+                    datasets.push({
+                        label: `Meta - ${rede}`, data: metaData,
+                        borderColor: colors[rede],
+                        backgroundColor: colors[rede],
+                        borderWidth: 2, borderDash: [5, 5],
+                        tension: 0.1, pointRadius: 2
+                    });
+                }
+            });
+            return datasets;
+        }
+
+        function filterRede(rede) {
+            currentFilterRede = rede;
+            ['all', 'total', 'estadual', 'publica', 'privada'].forEach(r => {
+                const btn = document.getElementById(`btn-${r}`);
+                btn.className = r === rede
+                    ? 'px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm'
+                    : 'px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm';
+            });
+            createChart();
+        }
+
+        function filterSerie(serie) {
+            currentFilterSerie = serie;
+            ['media', '1', '2', '3', 'sup'].forEach(s => {
+                const btn = document.getElementById(`btn-${s}`);
+                btn.className = s === serie
+                    ? 'px-4 py-2 rounded-lg bg-green-600 text-white text-sm'
+                    : 'px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm';
+            });
+            createChart();
+        }
+
+        function updateTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            currentData.forEach(row => {
+                const media = ((row.s1 + row.s2 + row.s3 + row.sup) / 4).toFixed(1);
+                const atingiuMeta = row.meta ? parseFloat(media) >= row.meta : null;
+                let statusHtml = '-';
+                if (atingiuMeta !== null) {
+                    statusHtml = atingiuMeta
+                        ? '<span class="text-green-600 font-semibold">✓ Atingiu</span>'
+                        : '<span class="text-red-600 font-semibold">✗ Não atingiu</span>';
+                }
+                const tr = document.createElement('tr');
+                tr.className = 'border-b hover:bg-gray-50';
+                tr.innerHTML = `
+                    <td class="px-3 py-2 font-semibold">${row.ano}</td>
+                    <td class="px-3 py-2">${row.rede}</td>
+                    <td class="px-3 py-2 text-center">${row.s1.toFixed(1)}%</td>
+                    <td class="px-3 py-2 text-center">${row.s2.toFixed(1)}%</td>
+                    <td class="px-3 py-2 text-center">${row.s3.toFixed(1)}%</td>
+                    <td class="px-3 py-2 text-center">${row.sup.toFixed(1)}%</td>
+                    <td class="px-3 py-2 text-center font-semibold">${media}%</td>
+                    <td class="px-3 py-2 text-center text-gray-500">${row.meta ? row.meta.toFixed(1) + '%' : '-'}</td>
+                    <td class="px-3 py-2 text-center font-semibold text-blue-600">${row.indicador.toFixed(2)}</td>
+                    <td class="px-3 py-2 text-center">${statusHtml}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+
+</html>

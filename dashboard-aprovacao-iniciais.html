@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Taxa de Aprovação - Anos Iniciais</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+
+<body class="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Taxa de Aprovação - Anos Iniciais</h1>
+            <p class="text-gray-600 text-lg">Análise por Rede de Ensino (1º ao 5º ano) - Brasil</p>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold text-gray-800">📊 Gerenciar Dados</h3>
+                <div class="flex gap-3">
+                    <button onclick="downloadTemplate()"
+                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                        ⬇️ Baixar Modelo Excel
+                    </button>
+                    <label
+                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition cursor-pointer">
+                        ⬆️ Carregar Arquivo Excel
+                        <input type="file" accept=".xlsx,.xls" onchange="handleFileUpload(event)" class="hidden">
+                    </label>
+                </div>
+            </div>
+
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                <p class="text-sm text-blue-900"><strong>Como usar:</strong></p>
+                <ol class="text-sm text-blue-800 mt-2 ml-4 list-decimal space-y-1">
+                    <li>Clique em "Baixar Modelo Excel" para obter o template</li>
+                    <li>Abra no Excel e preencha com seus dados</li>
+                    <li>Salve o arquivo Excel (.xlsx)</li>
+                    <li>Clique em "Carregar Arquivo Excel" e selecione seu arquivo</li>
+                    <li>O dashboard será atualizado automaticamente!</li>
+                </ol>
+                <p class="text-sm text-blue-900 mt-3">
+                    <strong>💡 Formato:</strong> O Excel deve ter as colunas: Ano, Rede, Serie_1, Serie_2, Serie_3,
+                    Serie_4, Serie_5, Indicador_Rendimento, Meta
+                </p>
+            </div>
+
+            <div id="uploadStatus" class="mt-4 hidden"></div>
+        </div>
+
+        <!-- Cards de Destaque -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+
+            <div class="bg-white rounded-lg shadow-lg p-4 border-l-4 border-blue-500">
+                <p class="text-gray-500 text-xs font-medium uppercase">Total Geral</p>
+                <p class="text-2xl font-bold mt-2 text-gray-800" id="card-total">97.6%</p>
+                <p class="text-blue-600 text-xs mt-1 font-semibold">▲ Evolução constante</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-4 border-l-4 border-purple-500">
+                <p class="text-gray-500 text-xs font-medium uppercase">Rede Estadual</p>
+                <p class="text-2xl font-bold mt-2 text-gray-800" id="card-estadual">98.2%</p>
+                <p class="text-purple-600 text-xs mt-1 font-semibold">▲ Acima da média</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-4 border-l-4 border-green-500">
+                <p class="text-gray-500 text-xs font-medium uppercase">Rede Municipal</p>
+                <p class="text-2xl font-bold mt-2 text-gray-800" id="card-municipal">96.8%</p>
+                <p class="text-green-600 text-xs mt-1 font-semibold">▲ Forte recuperação</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-4 border-l-4 border-yellow-500">
+                <p class="text-gray-500 text-xs font-medium uppercase">Rede Pública</p>
+                <p class="text-2xl font-bold mt-2 text-gray-800" id="card-publica">97.2%</p>
+                <p class="text-yellow-600 text-xs mt-1 font-semibold">▲ Convergência</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-4 border-l-4 border-pink-500">
+                <p class="text-gray-500 text-xs font-medium uppercase">Rede Privada</p>
+                <p class="text-2xl font-bold mt-2 text-gray-800" id="card-privada">99.1%</p>
+                <p class="text-pink-600 text-xs mt-1 font-semibold">⬌ Estabilidade Alta</p>
+            </div>
+
+        </div>
+        <!-- Filtros -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="flex items-center gap-4 mb-6 flex-wrap">
+                <span class="font-semibold text-gray-700">Visualizar Rede:</span>
+                <button onclick="filterRede('all')" id="btn-all"
+                    class="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm">Todas</button>
+                <button onclick="filterRede('total')" id="btn-total"
+                    class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm">Total</button>
+                <button onclick="filterRede('estadual')" id="btn-estadual"
+                    class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm">Estadual</button>
+                <button onclick="filterRede('municipal')" id="btn-municipal"
+                    class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm">Municipal</button>
+                <button onclick="filterRede('publica')" id="btn-publica"
+                    class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm">Pública</button>
+                <button onclick="filterRede('privada')" id="btn-privada"
+                    class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm">Privada</button>
+            </div>
+
+            <div class="flex items-center gap-4 mb-6 flex-wrap">
+                <span class="font-semibold text-gray-700">Visualizar Série:</span>
+                <button onclick="filterSerie('media')" id="btn-media"
+                    class="px-4 py-2 rounded-lg bg-green-600 text-white text-sm">Média Geral</button>
+                <button onclick="filterSerie('1')" id="btn-1"
+                    class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm">1º ano</button>
+                <button onclick="filterSerie('2')" id="btn-2"
+                    class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm">2º ano</button>
+                <button onclick="filterSerie('3')" id="btn-3"
+                    class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm">3º ano</button>
+                <button onclick="filterSerie('4')" id="btn-4"
+                    class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm">4º ano</button>
+                <button onclick="filterSerie('5')" id="btn-5"
+                    class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm">5º ano</button>
+            </div>
+
+            <!-- Gráfico de Evolução -->
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Evolução da Taxa de Aprovação</h3>
+            <canvas id="chartEvolution" height="100"></canvas>
+        </div>
+
+        <!-- Tabela -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Dados Completos por Ano</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs" id="dataTable">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-3 py-2 text-left font-semibold">Ano</th>
+                            <th class="px-3 py-2 text-left font-semibold">Rede</th>
+                            <th class="px-3 py-2 text-center font-semibold">1º ano</th>
+                            <th class="px-3 py-2 text-center font-semibold">2º ano</th>
+                            <th class="px-3 py-2 text-center font-semibold">3º ano</th>
+                            <th class="px-3 py-2 text-center font-semibold">4º ano</th>
+                            <th class="px-3 py-2 text-center font-semibold">5º ano</th>
+                            <th class="px-3 py-2 text-center font-semibold">Média</th>
+                            <th class="px-3 py-2 text-center font-semibold">Meta</th>
+                            <th class="px-3 py-2 text-center font-semibold">Indicador (P)</th>
+                            <th class="px-3 py-2 text-center font-semibold">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Insights -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">💡 Insights de Evolução (2005-2023)</h3>
+            <div class="space-y-4 text-gray-700">
+
+                <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                    <p class="font-semibold text-blue-800 mb-1">📉 Redução da Disparidade Histórica</p>
+                    <p>Houve uma forte convergência entre as redes. O "abismo" que existia em 2005 entre a Rede Privada
+                        e as Públicas foi praticamente eliminado, com todas as redes hoje operando acima de
+                        <strong>95%</strong> de aprovação.
+                    </p>
+                </div>
+
+                <div class="p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
+                    <p class="font-semibold text-green-800 mb-1">🚀 Ascensão da Rede Municipal</p>
+                    <p>A Rede Municipal apresentou a maior curva de crescimento. Saiu de um patamar de ~78% em 2005 para
+                        competir igualmente com a média geral em 2023, demonstrando alta eficácia nas políticas de
+                        recuperação.</p>
+                </div>
+
+                <div class="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500">
+                    <p class="font-semibold text-purple-800 mb-1">🎯 Superação de Metas</p>
+                    <p>Os resultados reais (linhas sólidas) mostram consistência em acompanhar ou superar as metas
+                        estipuladas (linhas pontilhadas) ao longo da última década, indicando planejamento efetivo.</p>
+                </div>
+
+                <div class="p-4 bg-orange-50 rounded-lg border-l-4 border-orange-500">
+                    <p class="font-semibold text-orange-800 mb-1">⚖️ Estabilidade Recente (2021-2023)</p>
+                    <p>Após o pico de aprovação em 2021 (reflexo do continuum curricular da pandemia), observa-se uma
+                        leve correção técnica em 2023, mas mantendo índices historicamente elevados.</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-8 text-gray-600 text-sm">
+            <p>Fonte: INEP - Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira</p>
+            <p class="mt-1">Dashboard - Taxa de Aprovação nos Anos Iniciais do Ensino Fundamental</p>
+        </div>
+    </div>
+
+    <script>
+        // Dados padrão (exemplo com 2023)
+        let currentData = [
+            { ano: 2005, rede: "Total", s1: 89.5, s2: 76.2, s3: 80.1, s4: 84.6, s5: 84.8, indicador: 0.83, meta: 81.6 },
+            { ano: 2005, rede: "Estadual", s1: 91.7, s2: 82.4, s3: 84.1, s4: 88.6, s5: 85.7, indicador: 0.86, meta: 85.5 },
+            { ano: 2005, rede: "Municipal", s1: 88.9, s2: 71.7, s3: 76.1, s4: 81.0, s5: 82.4, indicador: 0.80, meta: 78.1 },
+            { ano: 2005, rede: "Pública", s1: 89.4, s2: 74.1, s3: 78.1, s4: 83.0, s5: 83.4, indicador: 0.81, meta: 80.0 },
+            { ano: 2005, rede: "Privada", s1: 95.1, s2: 96.5, s3: 97.4, s4: 97.6, s5: 97.3, indicador: 0.97, meta: 97.1 },
+
+            { ano: 2007, rede: "Total", s1: 93.0, s2: 81.9, s3: 83.3, s4: 87.5, s5: 87.2, indicador: 0.86, meta: 85.8 },
+            { ano: 2007, rede: "Estadual", s1: 94.0, s2: 86.3, s3: 86.2, s4: 90.6, s5: 86.8, indicador: 0.89, meta: 88.0 },
+            { ano: 2007, rede: "Municipal", s1: 92.1, s2: 78.6, s3: 80.6, s4: 85.2, s5: 85.9, indicador: 0.84, meta: 83.5 },
+            { ano: 2007, rede: "Pública", s1: 92.5, s2: 80.3, s3: 82.0, s4: 86.5, s5: 86.2, indicador: 0.85, meta: 84.6 },
+            { ano: 2007, rede: "Privada", s1: 97.3, s2: 97.8, s3: 98.1, s4: 97.8, s5: 97.7, indicador: 0.98, meta: 97.4 },
+
+            { ano: 2009, rede: "Total", s1: 94.9, s2: 86.4, s3: 85.1, s4: 89.2, s5: 89.1, indicador: 0.89, meta: 88.5 },
+            { ano: 2009, rede: "Estadual", s1: 96.2, s2: 91.1, s3: 88.8, s4: 92.2, s5: 90.1, indicador: 0.92, meta: 91.1 },
+            { ano: 2009, rede: "Municipal", s1: 94.2, s2: 83.3, s3: 82.0, s4: 86.7, s5: 87.3, indicador: 0.86, meta: 86.2 },
+            { ano: 2009, rede: "Pública", s1: 94.5, s2: 84.9, s3: 83.5, s4: 88.0, s5: 88.0, indicador: 0.88, meta: 87.3 },
+            { ano: 2009, rede: "Privada", s1: 97.4, s2: 97.4, s3: 97.8, s4: 97.9, s5: 97.6, indicador: 0.98, meta: 97.6 },
+
+            { ano: 2011, rede: "Total", s1: 96.5, s2: 91.9, s3: 87.1, s4: 90.9, s5: 90.5, indicador: 0.91, meta: 91.2 },
+            { ano: 2011, rede: "Estadual", s1: 97.8, s2: 94.3, s3: 89.8, s4: 93.6, s5: 91.6, indicador: 0.93, meta: 93.1 },
+            { ano: 2011, rede: "Municipal", s1: 96.0, s2: 90.2, s3: 84.4, s4: 88.9, s5: 88.8, indicador: 0.90, meta: 89.4 },
+            { ano: 2011, rede: "Pública", s1: 96.3, s2: 91.0, s3: 85.4, s4: 89.9, s5: 89.5, indicador: 0.90, meta: 90.2 },
+            { ano: 2011, rede: "Privada", s1: 97.5, s2: 97.6, s3: 97.9, s4: 97.9, s5: 97.7, indicador: 0.98, meta: 97.7 },
+
+            { ano: 2013, rede: "Total", s1: 97.4, s2: 95.8, s3: 88.5, s4: 91.6, s5: 91.2, indicador: 0.93, meta: 92.7 },
+            { ano: 2013, rede: "Estadual", s1: 98.4, s2: 97.7, s3: 91.5, s4: 94.7, s5: 92.6, indicador: 0.95, meta: 94.7 },
+            { ano: 2013, rede: "Municipal", s1: 97.2, s2: 94.8, s3: 85.8, s4: 89.4, s5: 89.4, indicador: 0.91, meta: 91.1 },
+            { ano: 2013, rede: "Pública", s1: 97.4, s2: 95.3, s3: 86.8, s4: 90.4, s5: 90.1, indicador: 0.92, meta: 91.8 },
+            { ano: 2013, rede: "Privada", s1: 97.5, s2: 97.9, s3: 98.0, s4: 98.0, s5: 97.8, indicador: 0.98, meta: 97.8 },
+
+            { ano: 2015, rede: "Total", s1: 97.7, s2: 96.8, s3: 88.5, s4: 91.7, s5: 92.1, indicador: 0.93, meta: 93.2 },
+            { ano: 2015, rede: "Estadual", s1: 98.5, s2: 98.1, s3: 90.6, s4: 94.6, s5: 93.6, indicador: 0.95, meta: 94.8 },
+            { ano: 2015, rede: "Municipal", s1: 97.6, s2: 96.1, s3: 85.9, s4: 89.6, s5: 90.3, indicador: 0.92, meta: 91.6 },
+            { ano: 2015, rede: "Pública", s1: 97.7, s2: 96.4, s3: 86.7, s4: 90.5, s5: 91.0, indicador: 0.92, meta: 92.2 },
+            { ano: 2015, rede: "Privada", s1: 97.8, s2: 98.2, s3: 98.2, s4: 98.2, s5: 98.1, indicador: 0.98, meta: 98.1 },
+
+            { ano: 2017, rede: "Total", s1: 98.0, s2: 97.2, s3: 89.5, s4: 92.8, s5: 93.1, indicador: 0.94, meta: 94.0 },
+            { ano: 2017, rede: "Estadual", s1: 98.7, s2: 98.4, s3: 91.3, s4: 95.8, s5: 94.8, indicador: 0.96, meta: 95.6 },
+            { ano: 2017, rede: "Municipal", s1: 97.8, s2: 96.6, s3: 87.0, s4: 90.8, s5: 91.5, indicador: 0.93, meta: 92.5 },
+            { ano: 2017, rede: "Pública", s1: 97.9, s2: 96.9, s3: 87.7, s4: 91.7, s5: 92.1, indicador: 0.93, meta: 93.0 },
+            { ano: 2017, rede: "Privada", s1: 98.3, s2: 98.7, s3: 98.5, s4: 98.6, s5: 98.6, indicador: 0.99, meta: 98.6 },
+
+            { ano: 2019, rede: "Total", s1: 98.5, s2: 97.5, s3: 91.4, s4: 94.1, s5: 94.7, indicador: 0.95, meta: 95.1 },
+            { ano: 2019, rede: "Estadual", s1: 99.0, s2: 98.7, s3: 92.5, s4: 96.7, s5: 95.4, indicador: 0.96, meta: 96.3 },
+            { ano: 2019, rede: "Municipal", s1: 98.3, s2: 96.9, s3: 89.3, s4: 92.4, s5: 93.5, indicador: 0.94, meta: 93.9 },
+            { ano: 2019, rede: "Pública", s1: 98.4, s2: 97.2, s3: 89.8, s4: 93.1, s5: 93.8, indicador: 0.94, meta: 94.3 },
+            { ano: 2019, rede: "Privada", s1: 98.7, s2: 99.0, s3: 98.8, s4: 98.9, s5: 98.8, indicador: 0.99, meta: 98.8 },
+
+            { ano: 2021, rede: "Total", s1: 98.9, s2: 98.3, s3: 96.8, s4: 97.2, s5: 97.1, indicador: 0.98, meta: 97.6 },
+            { ano: 2021, rede: "Estadual", s1: 98.6, s2: 98.5, s3: 96.8, s4: 97.9, s5: 97.4, indicador: 0.98, meta: 97.8 },
+            { ano: 2021, rede: "Municipal", s1: 98.9, s2: 98.1, s3: 96.2, s4: 96.6, s5: 96.5, indicador: 0.97, meta: 97.2 },
+            { ano: 2021, rede: "Pública", s1: 98.9, s2: 98.2, s3: 96.3, s4: 96.8, s5: 96.7, indicador: 0.97, meta: 97.3 },
+            { ano: 2021, rede: "Privada", s1: 98.9, s2: 99.1, s3: 99.1, s4: 99.2, s5: 99.2, indicador: 0.99, meta: 99.1 },
+
+            { ano: 2023, rede: "Total", s1: 99.0, s2: 98.4, s3: 95.8, s4: 96.8, s5: 96.3, indicador: 0.97, meta: 97.2 },
+            { ano: 2023, rede: "Estadual", s1: 99.0, s2: 98.4, s3: 96.1, s4: 97.8, s5: 96.5, indicador: 0.98, meta: 97.5 },
+            { ano: 2023, rede: "Municipal", s1: 99.0, s2: 98.1, s3: 94.8, s4: 95.9, s5: 95.6, indicador: 0.97, meta: 96.6 },
+            { ano: 2023, rede: "Pública", s1: 99.0, s2: 98.1, s3: 95.0, s4: 96.2, s5: 95.7, indicador: 0.97, meta: 96.8 },
+            { ano: 2023, rede: "Privada", s1: 99.2, s2: 99.4, s3: 99.2, s4: 99.4, s5: 99.3, indicador: 0.99, meta: 99.3 }
+        ];
+
+
+        let chartEvolution;
+        let currentFilterRede = 'all';
+        let currentFilterSerie = 'media';
+
+        window.onload = function () {
+            updateCards();
+            createChart();
+            updateTable();
+        };
+
+        function downloadTemplate() {
+            const wb = XLSX.utils.book_new();
+
+            const data = [
+                ['Ano', 'Rede', 'Serie_1', 'Serie_2', 'Serie_3', 'Serie_4', 'Serie_5', 'Indicador_Rendimento', 'Meta'],
+                [2005, 'Total', 81.6, 89.5, 76.2, 80.1, 84.6, 0.83, 85.0],
+                [2005, 'Estadual', 85.5, 91.7, 82.4, 84.1, 88.6, 0.86, 87.0],
+                [2005, 'Municipal', 78.1, 88.9, 71.7, 76.1, 81.0, 0.80, 83.0],
+                [2005, 'Pública', 80.0, 89.4, 74.1, 78.1, 83.0, 0.81, 84.0],
+                [2005, 'Privada', 97.1, 95.1, 96.5, 97.4, 97.6, 0.97, ''],
+                ['', '', '', '', '', '', '', '', ''],
+                [2023, 'Total', 84.7, 91.2, 79.8, 83.5, 87.2, 0.85, 90.0],
+                [2023, 'Estadual', 88.0, 93.5, 85.2, 87.1, 90.3, 0.88, 92.0],
+                [2023, 'Municipal', 81.5, 90.1, 75.8, 80.2, 84.7, 0.82, 88.0],
+                [2023, 'Pública', 83.2, 91.0, 78.5, 82.1, 86.1, 0.84, 89.0],
+                [2023, 'Privada', 97.8, 96.2, 97.1, 97.9, 98.2, 0.97, '']
+            ];
+            
+
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            XLSX.utils.book_append_sheet(wb, ws, 'Taxa_Aprovacao');
+            XLSX.writeFile(wb, 'modelo_taxa_aprovacao_iniciais.xlsx');
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+
+                    const newData = jsonData.map(row => ({
+                        ano: parseInt(row.Ano),
+                        rede: row.Rede,
+                        s1: parseFloat(row.Serie_1) || 0,
+                        s2: parseFloat(row.Serie_2) || 0,
+                        s3: parseFloat(row.Serie_3) || 0,
+                        s4: parseFloat(row.Serie_4) || 0,
+                        s5: parseFloat(row.Serie_5) || 0,
+                        indicador: parseFloat(row.Indicador_Rendimento) || 0,
+                        meta: parseFloat(row.Meta) || null
+                    })).filter(row => row.ano && row.rede);
+
+                    currentData = newData;
+                    updateCards();
+                    createChart();
+                    updateTable();
+
+                    document.getElementById('uploadStatus').innerHTML = `
+                        <div class="p-3 bg-green-50 border border-green-200 rounded-lg">
+                            <p class="text-green-800 font-semibold">✓ Arquivo carregado com sucesso! (${newData.length} registros)</p>
+                        </div>
+                    `;
+                    document.getElementById('uploadStatus').classList.remove('hidden');
+                } catch (error) {
+                    alert('Erro ao processar arquivo. Verifique o formato!');
+                    console.error(error);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function updateCards() {
+            const lastYear = Math.max(...currentData.map(d => d.ano));
+            const lastData = currentData.filter(d => d.ano === lastYear);
+
+            lastData.forEach(d => {
+                const media = ((d.s1 + d.s2 + d.s3 + d.s4 + d.s5) / 5).toFixed(1);
+                const cardId = `card-${d.rede.toLowerCase()}`;
+                const card = document.getElementById(cardId);
+                if (card) {
+                    card.textContent = `${media}%`;
+                    card.nextElementSibling.textContent = `Indicador: ${d.indicador.toFixed(2)}`;
+                }
+            });
+        }
+
+        function createChart() {
+            if (chartEvolution) chartEvolution.destroy();
+
+            const anos = [...new Set(currentData.map(d => d.ano))].sort();
+            const datasets = getDatasets();
+
+            const ctx = document.getElementById('chartEvolution').getContext('2d');
+            chartEvolution = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: anos,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 60,
+                            max: 100,
+                            ticks: {
+                                callback: function (value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function getDatasets() {
+            const anos = [...new Set(currentData.map(d => d.ano))].sort();
+            const redes = ['Total', 'Estadual', 'Municipal', 'Pública', 'Privada'];
+            const colors = {
+                'Total': '#3b82f6',
+                'Estadual': '#8b5cf6',
+                'Municipal': '#10b981',
+                'Pública': '#f59e0b',
+                'Privada': '#ec4899'
+            };
+
+            const datasets = [];
+
+            redes.forEach(rede => {
+                const normalize = txt => txt.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+                if (
+                    currentFilterRede !== 'all' &&
+                    normalize(currentFilterRede) !== normalize(rede.toLowerCase())
+                ) return;
+
+                const data = anos.map(ano => {
+                    const row = currentData.find(d => d.ano === ano && d.rede === rede);
+                    if (!row) return null;
+
+                    if (currentFilterSerie === 'media') {
+                        return ((row.s1 + row.s2 + row.s3 + row.s4 + row.s5) / 5).toFixed(1);
+                    } else {
+                        return row[`s${currentFilterSerie}`];
+                    }
+                });
+
+                datasets.push({
+                    label: rede,
+                    data: data,
+                    borderColor: colors[rede],
+                    backgroundColor: colors[rede],
+                    borderWidth: 3,
+                    tension: 0.1
+                });
+
+                // Adicionar linha de meta tracejada
+                const metaData = anos.map(ano => {
+                    const row = currentData.find(d => d.ano === ano && d.rede === rede);
+                    return row && row.meta ? row.meta : null;
+                });
+
+                if (metaData.some(m => m !== null)) {
+                    datasets.push({
+                        label: `Meta - ${rede}`,
+                        data: metaData,
+                        borderColor: colors[rede],
+                        backgroundColor: colors[rede],
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        tension: 0.1,
+                        pointRadius: 2
+                    });
+                }
+            });
+
+            return datasets;
+        }
+
+        function filterRede(rede) {
+            currentFilterRede = rede;
+
+            ['all', 'total', 'estadual', 'municipal', 'publica', 'privada'].forEach(r => {
+                const btn = document.getElementById(`btn-${r}`);
+                if (r === rede) {
+                    btn.className = 'px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm';
+                } else {
+                    btn.className = 'px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm';
+                }
+            });
+
+            createChart();
+        }
+
+        function filterSerie(serie) {
+            currentFilterSerie = serie;
+
+            ['media', '1', '2', '3', '4', '5'].forEach(s => {
+                const btn = document.getElementById(`btn-${s}`);
+                if (s === serie) {
+                    btn.className = 'px-4 py-2 rounded-lg bg-green-600 text-white text-sm';
+                } else {
+                    btn.className = 'px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm';
+                }
+            });
+
+            createChart();
+        }
+
+        function updateTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            currentData.forEach(row => {
+                const media = ((row.s1 + row.s2 + row.s3 + row.s4 + row.s5) / 5).toFixed(1);
+                const atingiuMeta = row.meta ? parseFloat(media) >= row.meta : null;
+                const tr = document.createElement('tr');
+                tr.className = 'border-b hover:bg-gray-50';
+
+                let statusHtml = '-';
+                if (atingiuMeta !== null) {
+                    statusHtml = atingiuMeta
+                        ? '<span class="text-green-600 font-semibold">✓ Atingiu</span>'
+                        : '<span class="text-red-600 font-semibold">✗ Não atingiu</span>';
+                }
+
+                tr.innerHTML = `
+                    <td class="px-3 py-2 font-semibold">${row.ano}</td>
+                    <td class="px-3 py-2">${row.rede}</td>
+                    <td class="px-3 py-2 text-center">${row.s1.toFixed(1)}%</td>
+                    <td class="px-3 py-2 text-center">${row.s2.toFixed(1)}%</td>
+                    <td class="px-3 py-2 text-center">${row.s3.toFixed(1)}%</td>
+                    <td class="px-3 py-2 text-center">${row.s4.toFixed(1)}%</td>
+                    <td class="px-3 py-2 text-center">${row.s5.toFixed(1)}%</td>
+                    <td class="px-3 py-2 text-center font-semibold">${media}%</td>
+                    <td class="px-3 py-2 text-center text-gray-500">${row.meta ? row.meta.toFixed(1) + '%' : '-'}</td>
+                    <td class="px-3 py-2 text-center font-semibold text-blue-600">${row.indicador.toFixed(2)}</td>
+                    <td class="px-3 py-2 text-center">${statusHtml}</td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+
+</html>
